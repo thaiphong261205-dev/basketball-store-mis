@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HTTT quản lý cửa hàng dụng cụ bóng rổ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Be+Vietnam+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--court:#0E2A47;--court2:#173B61;--maple:#E2B87A;--lane:#B8392E;--line:#F5F7FA;--mut:#A9BBD0;--ink:#0B1D31}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;background:var(--ink);color:var(--line);font-family:'Be Vietnam Pro',system-ui,sans-serif}
+.deck{height:100%;position:relative;overflow:hidden}
+.slide{position:absolute;inset:0;padding:6vh 7vw 9vh;display:none;flex-direction:column;justify-content:center;background:var(--court);overflow:auto}
+.slide.on{display:flex}
+.slide::before{content:"";position:absolute;right:-12vw;top:50%;width:46vw;height:46vw;border:3px solid rgba(245,247,250,.1);border-radius:50%;transform:translateY(-50%);pointer-events:none}
+h1,h2{font-family:'Barlow Condensed',sans-serif;font-weight:700;line-height:1.02;letter-spacing:.01em}
+h1{font-size:clamp(2.6rem,7.5vw,6rem);max-width:15ch}
+h2{font-size:clamp(2rem,4.6vw,3.4rem);color:var(--maple);margin-bottom:3vh}
+p,li{font-size:clamp(1rem,1.9vw,1.35rem);line-height:1.6;max-width:62ch}
+.sub{color:var(--mut);margin-top:2.5vh}
+.meta{margin-top:5vh;color:var(--mut);font-size:clamp(.9rem,1.5vw,1.1rem);line-height:1.8}
+.meta b{color:var(--line);font-weight:600}
+ul{padding-left:1.2em;display:grid;gap:1.1vh}
+li::marker{color:var(--lane)}
+.grid{display:grid;gap:2vw;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));position:relative}
+.box{background:var(--court2);border-left:5px solid var(--lane);padding:2.2vh 1.6vw;border-radius:4px 10px 10px 4px}
+.box h3{font-size:clamp(1.05rem,1.8vw,1.3rem);color:var(--maple);margin-bottom:.8vh}
+.box p,.box li{font-size:clamp(.9rem,1.5vw,1.05rem);line-height:1.5}
+.box ul{gap:.4vh}
+table{border-collapse:collapse;width:100%;font-size:clamp(.85rem,1.4vw,1.05rem)}
+th,td{text-align:left;padding:1.1vh 1vw;border-bottom:1px solid rgba(245,247,250,.15)}
+th{color:var(--maple);font-weight:600}
+pre{background:#071626;border:1px solid rgba(245,247,250,.12);border-radius:8px;padding:2vh 1.6vw;font:clamp(.62rem,1.15vw,.86rem)/1.55 ui-monospace,Consolas,monospace;overflow:auto;max-height:68vh;color:#DCE7F3}
+pre .k{color:#F2B880}pre .c{color:#7F9AB5}pre .t{color:#8FD0A8}
+.ent{background:var(--court2);border-radius:8px;overflow:hidden;font-size:clamp(.75rem,1.25vw,.95rem)}
+.ent h3{background:var(--lane);padding:.7vh .9vw;font-size:clamp(.85rem,1.4vw,1.05rem)}
+.ent ul{list-style:none;padding:.8vh .9vw;gap:.2vh}
+.ent li{font-size:inherit;line-height:1.4}
+.ent li.pk::before{content:"PK ";color:var(--maple);font-weight:600}
+.ent li.fk::before{content:"FK ";color:#8FD0A8;font-weight:600}
+.note{margin-top:2.5vh;color:var(--mut);font-size:clamp(.85rem,1.4vw,1rem)}
+.flow{display:flex;flex-wrap:wrap;gap:1vw;align-items:center;margin-top:2vh}
+.flow span{background:var(--court2);border:1px solid rgba(226,184,122,.5);padding:1.2vh 1.2vw;border-radius:999px;font-size:clamp(.85rem,1.5vw,1.1rem)}
+.flow i{color:var(--maple);font-style:normal}
+.mock{background:#F5F7FA;color:var(--ink);border-radius:10px;overflow:hidden;font-size:clamp(.7rem,1.2vw,.9rem);box-shadow:0 20px 50px rgba(0,0,0,.35)}
+.mock .bar{background:var(--lane);color:#fff;padding:.8vh 1vw;font-weight:600}
+.mock .body{display:grid;grid-template-columns:1fr 1fr;gap:1vw;padding:1.4vh 1vw}
+.mock table{font-size:inherit}.mock th{color:var(--lane)}.mock td,.mock th{border-color:#d8dee6;padding:.6vh .6vw}
+.mock .pay{background:var(--court);color:#fff;border-radius:6px;padding:1.2vh 1vw}
+.mock .pay b{display:block;font-size:1.6em;color:var(--maple)}
+.mock button{margin-top:1vh;background:var(--lane);color:#fff;border:0;border-radius:4px;padding:.7vh 1.2vw;font:inherit}
+.nav{position:fixed;left:0;right:0;bottom:0;height:7vh;min-height:44px;display:flex;align-items:center;gap:1vw;padding:0 3vw;background:rgba(7,22,38,.92);z-index:5}
+.nav button{background:none;border:1px solid rgba(245,247,250,.3);color:var(--line);border-radius:6px;min-width:44px;height:34px;cursor:pointer;font:inherit}
+.nav button:hover,.nav button:focus-visible{border-color:var(--maple);outline:2px solid var(--maple);outline-offset:2px}
+.prog{flex:1;height:4px;background:rgba(245,247,250,.15);border-radius:2px;overflow:hidden}
+.prog div{height:100%;background:var(--lane);width:0;transition:width .25s}
+.cnt{color:var(--mut);font-size:.9rem;min-width:4.5em;text-align:right}
+@media(max-width:700px){.mock .body{grid-template-columns:1fr}}
+@media print{.slide{display:flex!important;position:relative;min-height:100vh;page-break-after:always}.nav{display:none}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main class="deck" id="deck">
+
+<section class="slide on">
+  <h1>Xây dựng hệ thống thông tin quản lý cửa hàng dụng cụ bóng rổ</h1>
+  <p class="sub">Môn: Phân tích và thiết kế hệ thống thông tin</p>
+  <p class="meta"><b>Sinh viên:</b> [Họ và tên] &nbsp;|&nbsp; <b>MSSV:</b> [Mã số]<br><b>Giảng viên hướng dẫn:</b> [Tên giảng viên] &nbsp;|&nbsp; <b>Lớp:</b> [Tên lớp]</p>
+</section>
+
+<section class="slide">
+  <h2>Đặt vấn đề và mục tiêu</h2>
+  <div class="grid">
+    <div class="box"><h3>Thực trạng</h3><ul><li>Ghi tồn kho bằng sổ tay hoặc Excel, dễ sai lệch</li><li>Khó biết size, màu, hãng nào sắp hết</li><li>Báo cáo doanh thu mất nhiều thời gian</li></ul></div>
+    <div class="box"><h3>Mục tiêu</h3><ul><li>Quản lý sản phẩm, nhập hàng, bán hàng trên một hệ thống</li><li>Tồn kho cập nhật tự động sau mỗi giao dịch</li><li>Thống kê doanh thu, lợi nhuận theo thời gian</li></ul></div>
+    <div class="box"><h3>Phạm vi</h3><ul><li>Một cửa hàng bán lẻ: bóng, giày, quần áo, phụ kiện</li><li>Ba nhóm người dùng: chủ cửa hàng, thu ngân, thủ kho</li></ul></div>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Khảo sát và yêu cầu chức năng</h2>
+  <table>
+    <tr><th>Nhóm chức năng</th><th>Mô tả</th></tr>
+    <tr><td>Quản lý sản phẩm</td><td>Thêm, sửa, xóa, tìm theo loại, hãng, size, giá</td></tr>
+    <tr><td>Nhập hàng</td><td>Lập phiếu nhập từ nhà cung cấp, tự cộng tồn kho</td></tr>
+    <tr><td>Bán hàng</td><td>Lập hóa đơn, in hóa đơn, tự trừ tồn kho</td></tr>
+    <tr><td>Khách hàng</td><td>Lưu thông tin, tích điểm, tra cứu lịch sử mua</td></tr>
+    <tr><td>Nhân viên và phân quyền</td><td>Đăng nhập, phân quyền theo vai trò</td></tr>
+    <tr><td>Báo cáo</td><td>Doanh thu, hàng bán chạy, hàng tồn thấp</td></tr>
+  </table>
+  <p class="note">Yêu cầu phi chức năng: giao diện dễ dùng, mật khẩu được băm, sao lưu dữ liệu định kỳ.</p>
+</section>
+
+<section class="slide">
+  <h2>Tác nhân và quyền hạn</h2>
+  <div class="grid">
+    <div class="box"><h3>Chủ cửa hàng</h3><ul><li>Toàn quyền hệ thống</li><li>Xem mọi báo cáo</li><li>Quản lý nhân viên, giá bán</li></ul></div>
+    <div class="box"><h3>Thu ngân</h3><ul><li>Lập hóa đơn bán hàng</li><li>Tra cứu sản phẩm, khách hàng</li><li>In hóa đơn</li></ul></div>
+    <div class="box"><h3>Thủ kho</h3><ul><li>Lập phiếu nhập</li><li>Kiểm kê, cập nhật tồn kho</li><li>Quản lý nhà cung cấp</li></ul></div>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Quy trình nghiệp vụ chính</h2>
+  <p>Bán hàng</p>
+  <div class="flow"><span>Đăng nhập</span><i>›</i><span>Chọn sản phẩm</span><i>›</i><span>Kiểm tra tồn</span><i>›</i><span>Chọn khách hàng</span><i>›</i><span>Lập và in hóa đơn</span><i>›</i><span>Trừ tồn kho</span></div>
+  <p style="margin-top:4vh">Nhập hàng</p>
+  <div class="flow"><span>Chọn nhà cung cấp</span><i>›</i><span>Nhập danh sách hàng</span><i>›</i><span>Lưu phiếu nhập</span><i>›</i><span>Cộng tồn kho</span></div>
+</section>
+
+<section class="slide">
+  <h2>Thiết kế CSDL (mô hình quan hệ)</h2>
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">
+    <div class="ent"><h3>SanPham</h3><ul><li class="pk">MaSP</li><li class="fk">MaLoai</li><li class="fk">MaNCC</li><li>TenSP, Hang, Size</li><li>GiaNhap, GiaBan</li><li>SoLuongTon</li></ul></div>
+    <div class="ent"><h3>LoaiSP</h3><ul><li class="pk">MaLoai</li><li>TenLoai</li></ul></div>
+    <div class="ent"><h3>NhaCungCap</h3><ul><li class="pk">MaNCC</li><li>TenNCC, SDT</li><li>DiaChi</li></ul></div>
+    <div class="ent"><h3>HoaDon</h3><ul><li class="pk">MaHD</li><li class="fk">MaNV</li><li class="fk">MaKH</li><li>NgayLap, TongTien</li></ul></div>
+    <div class="ent"><h3>ChiTietHoaDon</h3><ul><li class="pk">MaHD</li><li class="pk">MaSP</li><li>SoLuong, DonGia</li></ul></div>
+    <div class="ent"><h3>PhieuNhap</h3><ul><li class="pk">MaPN</li><li class="fk">MaNCC</li><li class="fk">MaNV</li><li>NgayNhap</li></ul></div>
+    <div class="ent"><h3>ChiTietPhieuNhap</h3><ul><li class="pk">MaPN</li><li class="pk">MaSP</li><li>SoLuong, GiaNhap</li></ul></div>
+    <div class="ent"><h3>KhachHang</h3><ul><li class="pk">MaKH</li><li>HoTen, SDT</li><li>DiemTichLuy</li></ul></div>
+    <div class="ent"><h3>NhanVien</h3><ul><li class="pk">MaNV</li><li>HoTen</li><li>TenDangNhap</li><li>MatKhauHash, VaiTro</li></ul></div>
+  </div>
+  <p class="note">Quan hệ: LoaiSP 1–n SanPham; NhaCungCap 1–n SanPham và PhieuNhap; HoaDon 1–n ChiTietHoaDon n–1 SanPham; PhieuNhap 1–n ChiTietPhieuNhap n–1 SanPham.</p>
+</section>
+
+<section class="slide">
+  <h2>Mã SQL: bảng và trigger trừ tồn kho</h2>
+<pre><span class="c">-- Đầy đủ trong docs/schema.sql</span>
+<span class="k">CREATE TABLE</span> SanPham (
+  MaSP <span class="t">INT IDENTITY PRIMARY KEY</span>, TenSP <span class="t">NVARCHAR(150)</span> <span class="k">NOT NULL</span>,
+  MaLoai <span class="t">INT</span> <span class="k">REFERENCES</span> LoaiSP(MaLoai),
+  MaNCC  <span class="t">INT</span> <span class="k">REFERENCES</span> NhaCungCap(MaNCC),
+  Hang <span class="t">NVARCHAR(50)</span>, Size <span class="t">NVARCHAR(20)</span>,
+  GiaNhap <span class="t">MONEY</span>, GiaBan <span class="t">MONEY</span>,
+  SoLuongTon <span class="t">INT</span> <span class="k">DEFAULT</span> 0 <span class="k">CHECK</span> (SoLuongTon &gt;= 0));
+
+<span class="k">CREATE TRIGGER</span> trg_BanHang <span class="k">ON</span> ChiTietHoaDon <span class="k">AFTER INSERT AS</span>
+  <span class="k">UPDATE</span> s <span class="k">SET</span> s.SoLuongTon = s.SoLuongTon - i.SoLuong
+  <span class="k">FROM</span> SanPham s <span class="k">JOIN</span> inserted i <span class="k">ON</span> s.MaSP = i.MaSP;</pre>
+  <p class="note">Ràng buộc CHECK ngăn bán vượt số lượng tồn; trigger giữ tồn kho luôn đúng.</p>
+</section>
+
+<section class="slide">
+  <h2>Kiến trúc và công nghệ</h2>
+  <div class="grid">
+    <div class="box"><h3>Giao diện</h3><p>C# Windows Forms: form đăng nhập, form chính, form bán hàng, form báo cáo.</p></div>
+    <div class="box"><h3>Xử lý nghiệp vụ</h3><p>Tách lớp: GUI, BLL (nghiệp vụ), DAL (truy cập dữ liệu) bằng ADO.NET.</p></div>
+    <div class="box"><h3>Dữ liệu</h3><p>SQL Server, truy vấn bằng tham số để tránh SQL Injection.</p></div>
+    <div class="box"><h3>Báo cáo</h3><p>Xuất hóa đơn, báo cáo doanh thu bằng Report Viewer hoặc Excel.</p></div>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Giao diện minh họa: màn hình bán hàng</h2>
+  <div class="mock">
+    <div class="bar">Bán hàng — Thu ngân: Nguyễn Văn A</div>
+    <div class="body">
+      <table>
+        <tr><th>Sản phẩm</th><th>SL</th><th>Đơn giá</th></tr>
+        <tr><td>Bóng Spalding TF-1000 size 7</td><td>1</td><td>1.250.000</td></tr>
+        <tr><td>Giày Nike Lebron size 42</td><td>1</td><td>3.200.000</td></tr>
+        <tr><td>Băng cổ tay</td><td>2</td><td>90.000</td></tr>
+      </table>
+      <div class="pay">Khách hàng: Trần B (120 điểm)<b>4.630.000 đ</b>Tổng tiền<br><button>Thanh toán và in hóa đơn</button></div>
+    </div>
+  </div>
+  <p class="note">Dữ liệu minh họa. Thay bằng ảnh chụp màn hình thật của chương trình.</p>
+</section>
+
+<section class="slide">
+  <h2>Kết quả và hướng phát triển</h2>
+  <div class="grid">
+    <div class="box"><h3>Đã đạt được</h3><ul><li>Quản lý sản phẩm, nhập, bán trên một hệ thống</li><li>Tồn kho tự động, giảm sai sót</li><li>Báo cáo doanh thu nhanh</li></ul></div>
+    <div class="box"><h3>Hướng phát triển</h3><ul><li>Phiên bản web và ứng dụng di động</li><li>Quét mã vạch khi bán hàng</li><li>Kết nối bán online và thanh toán điện tử</li></ul></div>
+  </div>
+  <p class="sub">Cảm ơn thầy cô và các bạn đã lắng nghe. Xin mời đặt câu hỏi.</p>
+</section>
+
+</main>
+
+<nav class="nav" aria-label="Điều hướng slide">
+  <button id="prev" aria-label="Slide trước">‹</button>
+  <button id="next" aria-label="Slide sau">›</button>
+  <div class="prog"><div id="bar"></div></div>
+  <span class="cnt" id="cnt"></span>
+  <button id="fs" aria-label="Toàn màn hình">⛶</button>
+</nav>
+
+<script>
+(function(){
+  var s=[].slice.call(document.querySelectorAll('.slide')),i=0,bar=document.getElementById('bar'),cnt=document.getElementById('cnt');
+  function go(n){
+    i=Math.max(0,Math.min(s.length-1,n));
+    s.forEach(function(el,k){el.classList.toggle('on',k===i)});
+    bar.style.width=((i+1)/s.length*100)+'%';
+    cnt.textContent=(i+1)+' / '+s.length;
+    try{history.replaceState(null,'','#'+(i+1))}catch(e){}
+  }
+  document.getElementById('prev').onclick=function(){go(i-1)};
+  document.getElementById('next').onclick=function(){go(i+1)};
+  document.getElementById('fs').onclick=function(){
+    if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();
+  };
+  document.addEventListener('keydown',function(e){
+    if(['ArrowRight','PageDown',' '].indexOf(e.key)>-1){e.preventDefault();go(i+1)}
+    else if(['ArrowLeft','PageUp'].indexOf(e.key)>-1){e.preventDefault();go(i-1)}
+    else if(e.key==='Home')go(0);else if(e.key==='End')go(s.length-1);
+    else if(e.key==='f'||e.key==='F')document.getElementById('fs').click();
+  });
+  var x0=null;
+  document.addEventListener('touchstart',function(e){x0=e.touches[0].clientX},{passive:true});
+  document.addEventListener('touchend',function(e){
+    if(x0===null)return;var d=e.changedTouches[0].clientX-x0;
+    if(Math.abs(d)>60)go(d<0?i+1:i-1);x0=null;
+  });
+  go((parseInt(location.hash.slice(1),10)||1)-1);
+})();
+</script>
+</body>
+</html>
